@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Corrida de Carrinhos</title>
+    <link rel="stylesheet" href="../static/style.css" />
+  </head>
+  <body>
+    <div class="race-container">
+      <h1 class="title">Corrida de Carrinhos</h1>
+
+      <div class="lights-container">
+        <div class="light" id="light1"></div>
+        <div class="light" id="light2"></div>
+        <div class="light" id="light3"></div>
+      </div>
+
+      <!-- Cronômetro -->
+      <div class="timer">
+        <span id="minutes">00</span>:<span id="seconds">00</span>.<span
+          id="milliseconds"
+          >000</span
+        >
+      </div>
+
+      <div class="track">
+        <div class="checkpoint sensor1">
+          <span class="label">Checkpoint 1</span>
+          <span class="time highlight" id="sensor1-time">--:--:--</span>
+        </div>
+
+        <div class="checkpoint sensor2">
+          <span class="label">Checkpoint 2</span>
+          <span class="time highlight" id="sensor2-time">--:--:--</span>
+        </div>
+
+        <div class="checkpoint sensor3">
+          <span class="label">Checkpoint 3</span>
+          <span class="time highlight" id="sensor3-time">--:--:--</span>
+        </div>
+
+        <div class="checkpoint finish">
+          <span class="label">Chegada</span>
+          <span class="time highlight" id="finish-time">--:--:--</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sons -->
+    <audio id="start-sound" src="../static/largada.mp3"></audio>
+    <audio id="checkpoint-sound" src="../static/checkpoint.mp3"></audio>
+    <audio id="finish-sound" src="../static/chegada.mp3"></audio>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script src="../static/script.js"></script>
+  </body>
+</html>
