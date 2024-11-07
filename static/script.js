@@ -1,93 +1,96 @@
+// Conecta ao servidor WebSocket
+const socket = io.connect("http://192.168.0.101:5000");
+
 let startTime;
 let timerInterval;
-let startTimestamp; // Armazena o timestamp de início
-let currentTimeMilliseconds = 0; // Armazena o tempo em milissegundos
 
-// Inicia o cronômetro
-function startTimer() {
-  startTimestamp = Date.now(); // Salva o timestamp de início
-  currentTimeMilliseconds = 0; // Reinicia o tempo acumulado
-  timerInterval = setInterval(updateTimer, 10); // Atualiza a cada 10 milissegundos
-}
-
-// Atualiza o cronômetro
-function updateTimer() {
-  currentTimeMilliseconds = Date.now() - startTimestamp; // Calcula o tempo total em milissegundos
-  const minutes = Math.floor((currentTimeMilliseconds % 3600000) / 60000);
-  const seconds = Math.floor((currentTimeMilliseconds % 60000) / 1000);
-  const milliseconds = Math.floor(currentTimeMilliseconds % 1000);
-
-  document.getElementById("minutes").innerText = String(minutes).padStart(
+// Função para atualizar o cronômetro
+function atualizarCronometro() {
+  const tempoAtual = new Date() - startTime;
+  const minutos = String(Math.floor((tempoAtual / 60000) % 60)).padStart(
     2,
     "0"
   );
-  document.getElementById("seconds").innerText = String(seconds).padStart(
+  const segundos = String(Math.floor((tempoAtual / 1000) % 60)).padStart(
     2,
     "0"
   );
-  document.getElementById("milliseconds").innerText = String(
-    milliseconds
-  ).padStart(3, "0");
+  const milissegundos = String(tempoAtual % 1000).padStart(3, "0");
+
+  document.getElementById("minutes").textContent = minutos;
+  document.getElementById("seconds").textContent = segundos;
+  document.getElementById("milliseconds").textContent = milissegundos;
 }
 
-// WebSocket para receber dados em tempo real do servidor Python
-const socket = io.connect("http://localhost:5000");
+// Função para iniciar a sequência de largada (sem iniciar o cronômetro)
+function iniciarLargada() {
+  const luzes = [
+    document.getElementById("light1"),
+    document.getElementById("light2"),
+    document.getElementById("light3"),
+  ];
+  let index = 0;
 
-socket.on("comeco", function () {
-  console.log("Corrida começou!");
-  startTimer();
+  const interval = setInterval(() => {
+    document.getElementById("start-sound").play(); // Som de largada
+    if (index > 0) luzes[index - 1].classList.remove("active");
+    if (index < luzes.length) {
+      luzes[index].classList.add("active");
+      index++;
+    } else {
+      clearInterval(interval);
+      luzes[luzes.length - 1].classList.remove("active");
+      luzes[luzes.length - 1].classList.add("go"); // Luz verde para partida
+      luzes[luzes.length - 2].classList.add("go"); // Luz verde para partida
+      luzes[luzes.length - 3].classList.add("go"); // Luz verde para partida
+      document.getElementById("start-sound").play(); // Som de largada
+      setTimeout(() => luzes[luzes.length - 1].classList.remove("go"), 1500); // Remove a luz verde
+      setTimeout(() => luzes[luzes.length - 2].classList.remove("go"), 1500); // Remove a luz verde
+      setTimeout(() => luzes[luzes.length - 3].classList.remove("go"), 1500); // Remove a luz verde
+    }
+  }, 1000); // Intervalo entre as luzes
+}
+
+// Função para iniciar o cronômetro
+function iniciarCronometro() {
+  startTime = new Date();
+  timerInterval = setInterval(atualizarCronometro, 10);
+  document.getElementById("finish-time").textContent = "--:--:--";
+}
+
+// Evento para o botão de largada (apenas animação das luzes)
+document
+  .getElementById("start-button")
+  .addEventListener("click", iniciarLargada);
+
+// Evento "start" para iniciar o cronômetro
+socket.on("start", () => {
+  startTime = new Date();
+  timerInterval = setInterval(atualizarCronometro, 10); // Atualiza a cada 10ms
+  document.getElementById("finish-time").textContent = "--:--:--"; // Limpa o tempo de chegada
 });
 
-socket.on("check1", function () {
-  console.log("Passou pelo checkpoint 1");
-  const checkpointTime = formatTime(currentTimeMilliseconds); // Formata o tempo atual em milissegundos
-  updateTime("sensor1-time", checkpointTime);
-});
+// Evento "finish" para parar o cronômetro e exibir o tempo final formatado
+socket.on("finish", () => {
+  document.getElementById("finish-sound").play(); // Som de chegada
+  clearInterval(timerInterval); // Para o cronômetro
 
-socket.on("check2", function () {
-  console.log("Passou pelo checkpoint 2");
-  const checkpointTime = formatTime(currentTimeMilliseconds); // Formata o tempo atual em milissegundos
-  updateTime("sensor2-time", checkpointTime);
-});
-
-socket.on("check3", function () {
-  console.log("Passou pelo checkpoint 3");
-  const checkpointTime = formatTime(currentTimeMilliseconds); // Formata o tempo atual em milissegundos
-  updateTime("sensor3-time", checkpointTime);
-});
-
-socket.on("chegada", function () {
-  console.log("Corrida acabou!");
-  const finishTime = formatTime(currentTimeMilliseconds); // Formata o tempo atual em milissegundos
-  updateTime("finish-time", finishTime);
-  clearInterval(timerInterval); // Para o cronômetro quando chega ao final
-});
-
-// Função para formatar o tempo em mm:ss:ms
-function formatTime(elapsedTime) {
-  const minutes = Math.floor(elapsedTime / 60000);
-  const seconds = Math.floor((elapsedTime % 60000) / 1000);
-  const milliseconds = elapsedTime % 1000;
-
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
+  // Calcula e formata o tempo final apenas uma vez
+  const tempoFinal = new Date() - startTime;
+  const minutos = String(Math.floor((tempoFinal / 60000) % 60)).padStart(
     2,
     "0"
-  )}:${String(milliseconds).padStart(3, "0")}`;
-}
+  );
+  const segundos = String(Math.floor((tempoFinal / 1000) % 60)).padStart(
+    2,
+    "0"
+  );
+  const milissegundos = String(tempoFinal % 1000).padStart(3, "0");
 
-// Função para atualizar o tempo de cada sensor
-function updateTime(sensor, message) {
-  const timeElement = document.getElementById(sensor);
-  timeElement.innerText = message; // Atualiza o texto do elemento
-
-  timeElement.classList.add("highlight"); // Adiciona destaque com animação
-  playSound(sensor === "finish-time" ? "finish-sound" : "checkpoint-sound");
-}
-
-// Função para tocar os sons
-function playSound(soundId) {
-  const sound = document.getElementById(soundId);
-  if (sound) {
-    sound.play();
-  }
-}
+  // Define o tempo final para ambas as exibições
+  const tempoFormatado = `${minutos}:${segundos}.${milissegundos}`;
+  document.getElementById("minutes").textContent = minutos;
+  document.getElementById("seconds").textContent = segundos;
+  document.getElementById("milliseconds").textContent = milissegundos;
+  document.getElementById("finish-time").textContent = tempoFormatado;
+});

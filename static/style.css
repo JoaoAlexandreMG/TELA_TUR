@@ -15,10 +15,11 @@ body {
 }
 
 .title {
-  font-size: 48px;
-  margin-bottom: 20px;
+  font-size: 100px;
   text-transform: uppercase;
   letter-spacing: 5px;
+  margin-bottom: 5px;
+  margin-top: 5px;
   color: #00aaff; /* Azul claro */
   animation: pulse 1.5s infinite;
 }
@@ -26,30 +27,35 @@ body {
 .lights-container {
   display: flex;
   justify-content: space-around;
-  width: 200px;
-  margin: 20px auto;
+  width: 400px;
+  gap: 10px;
 }
 
 .light {
-  width: 50px;
-  height: 50px;
-  background-color: red;
+  width: 100px;
+  height: 100px;
+  background-color: gray;
   border-radius: 50%;
-  box-shadow: 0px 0px 10px #ff0000;
-  transition: background-color 0.5s, box-shadow 0.5s;
+  transition: background-color 0.3s, box-shadow 0.3s;
 }
 
-.green {
-  background-color: #00ff00;
-  box-shadow: 0px 0px 10px #00ff00;
+.light.active {
+  background-color: red;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+}
+
+.light.go {
+  background-color: green;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
 }
 
 /* Estilo para o cronômetro */
 .timer {
-  font-size: 36px;
+  font-size: 56px;
   font-weight: bold;
   color: #ffeb3b; /* Amarelo forte */
-  margin-bottom: 20px;
+  margin-top: 20px;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
 }
 
 .track {
@@ -57,13 +63,13 @@ body {
   justify-content: space-around;
   width: 80%;
   position: relative;
-  margin-top: 50px;
+  margin-top: 20px;
 }
 
 .checkpoint {
   position: relative;
   background-color: #333;
-  padding: 20px;
+  padding: 30px;
   border-radius: 10px;
   width: 150px;
   height: 150px;
@@ -76,13 +82,13 @@ body {
 }
 
 .label {
-  font-size: 18px;
+  font-size: 38px;
   margin-bottom: 10px;
   color: #fff;
 }
 
 .time {
-  font-size: 24px;
+  font-size: 44px;
   font-weight: bold;
   color: #00aaff;
 }
@@ -124,5 +130,71 @@ body {
   to {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+/* Botão de largada */
+.start-button {
+  padding: 16px 29px;
+  font-size: 25px;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(45deg, #007bff, #00aaff);
+  border: 2px solid #00aaff;
+  border-radius: 50px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.start-button:hover {
+  background: linear-gradient(45deg, #00aaff, #007bff);
+  border-color: #007bff;
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.3);
+  transform: translateY(-3px); /* Efeito de elevação */
+}
+
+.start-button:active {
+  transform: translateY(1px); /* Efeito de pressionamento */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilo para a área de exibição do tempo */
+#finish-time {
+  font-size: 28px;
+  font-weight: bold;
+  color: #ffeb3b;
+  margin-top: 30px;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+/* Estilos de responsividade */
+@media (max-width: 768px) {
+  .title {
+    font-size: 36px;
+  }
+
+  .timer {
+    font-size: 30px;
+  }
+
+  .lights-container {
+    width: 150px;
+  }
+
+  .light {
+    width: 40px;
+    height: 40px;
+  }
+
+  .start-button {
+    padding: 8px 16px;
+    font-size: 16px;
+  }
+
+  #finish-time {
+    font-size: 36px;
   }
 }
